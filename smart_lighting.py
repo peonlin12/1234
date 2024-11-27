@@ -15,11 +15,12 @@ BATTERY_LEVEL_PIN = 18        # GPIO pin to simulate battery level reading (conn
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(PIR_SENSOR_PIN, GPIO.IN)       # Set PIR sensor pin as input
+GPIO.setup(PIR_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)       # Set PIR sensor pin as input with pull-down resistor
 GPIO.setup(RELAY_PIN, GPIO.OUT)           # Set relay pin as output
 GPIO.output(RELAY_PIN, GPIO.LOW)          # Start with the relay off
-GPIO.setup(BATTERY_LEVEL_PIN, GPIO.IN)
+GPIO.setup(BATTERY_LEVEL_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)    # Set battery level pin with pull-down resistor
 
+# Function to monitor battery level
 def check_battery_level(queue):
     while True:
         # Placeholder function to simulate battery level check
@@ -32,6 +33,7 @@ def check_battery_level(queue):
             print("Battery level is sufficient.")
         time.sleep(5)  # Check battery level every 5 seconds
 
+# Function to control relay based on received messages
 def control_relay(queue):
     while True:
         if not queue.empty():
@@ -46,6 +48,7 @@ def control_relay(queue):
                 GPIO.output(RELAY_PIN, GPIO.LOW)   # Turn off relay to save power
                 print("Relay turned OFF due to low battery")
 
+# Function to monitor motion sensor
 def motion_sensor(queue):
     while True:
         if GPIO.input(PIR_SENSOR_PIN):
@@ -56,17 +59,23 @@ def motion_sensor(queue):
             queue.put("No motion")
         time.sleep(1)  # Check motion every 1 second
 
+# Main function to initialize processes and manage IPC
 if __name__ == "__main__":
     try:
+        # Queue for inter-process communication
         q = Queue()
+        
+        # Initialize processes
         battery_process = Process(target=check_battery_level, args=(q,))
         motion_process = Process(target=motion_sensor, args=(q,))
         control_process = Process(target=control_relay, args=(q,))
 
+        # Start all processes
         battery_process.start()
         motion_process.start()
         control_process.start()
 
+        # Wait for all processes to finish
         battery_process.join()
         motion_process.join()
         control_process.join()
