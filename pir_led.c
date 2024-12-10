@@ -20,12 +20,15 @@ int main(void) {
     pinMode(CDS_SENSOR_PIN, INPUT);
     softPwmCreate(LED_PIN, 0, 100); // Create software PWM for LED (0-100 range)
 
-    printf("Initializing PIR and CDS sensors... Please wait\n");
-    delay(2000); // Sensor stabilization time
-    printf("Sensors are ready!\n");
+    printf("Initializing PIR sensor... Please wait\n");
+    delay(3000); // PIR stabilization time
+    printf("PIR sensor is ready!\n");
 
     while (1) {
-        if (digitalRead(PIR_SENSOR_PIN) == HIGH) { // Motion detected
+        int pirValue = digitalRead(PIR_SENSOR_PIN); // Read PIR sensor value
+        printf("PIR Sensor Value: %d\n", pirValue); // Debug output
+
+        if (pirValue == HIGH) { // Motion detected
             printf("Motion detected! Checking light level...\n");
 
             int lightLevel = digitalRead(CDS_SENSOR_PIN); // Read CDS sensor
@@ -49,8 +52,12 @@ int main(void) {
             // Turn off LED
             softPwmWrite(LED_PIN, 0);
             printf("LED turned off.\n");
+        } else {
+            // Ensure LED is off if no motion
+            softPwmWrite(LED_PIN, 0);
         }
-        delay(100); // Check PIR sensor every 100ms
+
+        delay(500); // Check PIR sensor every 500ms
     }
 
     return 0;
