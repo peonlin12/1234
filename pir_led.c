@@ -3,35 +3,35 @@
 #include <stdlib.h>
 #include <unistd.h> // for sleep function
 
-// 핀 번호 설정
-#define PIR_SENSOR_PIN 0  // PIR 센서 (WiringPi 기준 GPIO 17)
-#define LED_PIN 2         // LED 핀 (WiringPi 기준 GPIO 27)
+// Pin configuration
+#define PIR_SENSOR_PIN 0  // PIR sensor (WiringPi GPIO 17)
+#define LED_PIN 2         // LED pin (WiringPi GPIO 27)
 
 int main(void) {
-    // WiringPi 초기화
+    // Initialize WiringPi
     if (wiringPiSetup() == -1) {
-        printf("WiringPi 초기화 실패!\n");
+        printf("Failed to initialize WiringPi!\n");
         return 1;
     }
 
-    // 핀 모드 설정
+    // Set pin modes
     pinMode(PIR_SENSOR_PIN, INPUT);
     pinMode(LED_PIN, OUTPUT);
 
-    printf("PIR 센서 초기화 중... 대기하세요\n");
-    delay(2000); // 센서 안정화 시간 (2초)
-    printf("PIR 센서 준비 완료!\n");
+    printf("Initializing PIR sensor... Please wait\n");
+    delay(2000); // Sensor stabilization time (2 seconds)
+    printf("PIR sensor is ready!\n");
 
     while (1) {
-        // PIR 센서 감지 확인
+        // Check PIR sensor signal
         if (digitalRead(PIR_SENSOR_PIN) == HIGH) {
-            printf("움직임 감지됨! LED 켜짐\n");
-            digitalWrite(LED_PIN, HIGH); // LED 켜기
-            delay(10000); // 10초 대기
-            digitalWrite(LED_PIN, LOW);  // LED 끄기
-            printf("LED 꺼짐\n");
+            printf("Motion detected! Turning LED on\n");
+            digitalWrite(LED_PIN, HIGH); // Turn on LED
+            delay(10000); // Wait for 10 seconds
+            digitalWrite(LED_PIN, LOW);  // Turn off LED
+            printf("LED turned off\n");
         }
-        delay(100); // 100ms 주기로 센서 상태 확인
+        delay(100); // Check sensor signal every 100ms
     }
 
     return 0;
