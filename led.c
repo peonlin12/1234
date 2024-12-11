@@ -3,32 +3,32 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-// GPIO 핀 번호 설정
-#define PIR_PIN 0   // PIR 센서 OUT 핀 (wiringPi의 0번 핀)
-#define LED_PIN 1   // LED 핀 (wiringPi의 1번 핀)
+// GPIO pin numbers
+#define PIR_PIN 0   // PIR sensor OUT pin (wiringPi pin 0)
+#define LED_PIN 1   // LED pin (wiringPi pin 1)
 
 int main(void)
 {
-    // wiringPi 초기화
+    // Initialize wiringPi
     if (wiringPiSetup() == -1) {
-        printf("wiringPi 초기화 실패\n");
+        printf("wiringPi initialization failed\n");
         return -1;
     }
 
-    // 핀 모드 설정
-    pinMode(PIR_PIN, INPUT);  // PIR 센서를 입력으로 설정
-    pinMode(LED_PIN, OUTPUT);  // LED를 출력으로 설정
+    // Set pin modes
+    pinMode(PIR_PIN, INPUT);  // Set PIR sensor as input
+    pinMode(LED_PIN, OUTPUT);  // Set LED as output
 
-    printf("PIR 센서 테스트 시작...\n");
+    printf("PIR sensor test started...\n");
 
     while (1) {
-        if (digitalRead(PIR_PIN) == HIGH) {  // PIR 센서가 동작을 감지하면
-            printf("움직임 감지됨!\n");
-            digitalWrite(LED_PIN, HIGH);  // LED 켜기
-            sleep(5);  // 5초 동안 LED 유지
-            digitalWrite(LED_PIN, LOW);  // LED 끄기
+        if (digitalRead(PIR_PIN) == HIGH) {  // If PIR sensor detects motion
+            printf("Motion detected!\n");
+            digitalWrite(LED_PIN, HIGH);  // Turn on LED
+            sleep(5);  // Keep LED on for 5 seconds
+            digitalWrite(LED_PIN, LOW);  // Turn off LED
         } else {
-            usleep(100000);  // 센서 상태 확인 주기 (0.1초)
+            usleep(100000);  // Check sensor status every 0.1 seconds
         }
     }
 
