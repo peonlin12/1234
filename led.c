@@ -1,54 +1,35 @@
 #include <wiringPi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <softPwm.h>
+#include <unistd.h>
 
-// Pin configuration
-#define PIR_SENSOR_PIN 0  // PIR sensor (WiringPi GPIO 17)
-#define CDS_SENSOR_PIN 2  // CDS sensor (WiringPi GPIO 27)
-#define LED_PIN 1         // LED pin (WiringPi GPIO 18)
+// GPIO 핀 번호 설정
+#define PIR_PIN 0   // PIR 센서 OUT 핀 (wiringPi의 0번 핀)
+#define LED_PIN 1   // LED 핀 (wiringPi의 1번 핀)
 
-int main(void) {
+int main(void)
+{
+    // wiringPi 초기화
     if (wiringPiSetup() == -1) {
-        printf("Failed to initialize WiringPi!\n");
-        return 1;
+        printf("wiringPi 초기화 실패\n");
+        return -1;
     }
 
-    pinMode(PIR_SENSOR_PIN, INPUT);
-    pinMode(CDS_SENSOR_PIN, INPUT);
-    softPwmCreate(LED_PIN, 0, 100); // Create software PWM for LED (0-100 range)
+    // 핀 모드 설정
+    pinMode(PIR_PIN, INPUT);  // PIR 센서를 입력으로 설정
+    pinMode(LED_PIN, OUTPUT);  // LED를 출력으로 설정
 
-    printf("Initializing PIR sensor... Please wait\n");
-    delay(3000); // PIR stabilization time
-    printf("PIR sensor is ready!\n");
+    printf("PIR 센서 테스트 시작...\n");
 
     while (1) {
-        int pirValue = digitalRead(PIR_SENSOR_PIN); // Read PIR sensor value
-        int lightLevel = digitalRead(CDS_SENSOR_PIN); // Read CDS sensor value
-
-        printf("PIR Sensor Value: %d, CDS Sensor Value: %d\n", pirValue, lightLevel);
-
-        if (pirValue == HIGH) { // Motion detected
-            printf("Motion detected! Checking light level...\n");
-
-            int brightness;
-            if (lightLevel == LOW) { // Dark environment
-                brightness = 100;
-                printf("Dark environment detected. LED at full brightness.\n");
-            } else { // Bright environment
-                brightness = 30;
-                printf("Bright environment detected. LED dimmed.\n");
-            }
-
-            softPwmWrite(LED_PIN, brightness);
-            delay(10000); // Keep LED on for 10 seconds
-            softPwmWrite(LED_PIN, 0);
-            printf("LED turned off.\n");
+        if (digitalRead(PIR_PIN) == HIGH) {  // PIR 센서가 동작을 감지하면
+            printf("움직임 감지됨!\n");
+            digitalWrite(LED_PIN, HIGH);  // LED 켜기
+            sleep(5);  // 5초 동안 LED 유지
+            digitalWrite(LED_PIN, LOW);  // LED 끄기
         } else {
-            softPwmWrite(LED_PIN, 0); // Ensure LED is off
+            usleep(100000);  // 센서 상태 확인 주기 (0.1초)
         }
-
-        delay(500); // Delay for sensor check
     }
 
     return 0;
