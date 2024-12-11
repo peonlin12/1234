@@ -27,8 +27,9 @@ int main(void)
             digitalWrite(LED_PIN, HIGH);  // Turn on LED
             sleep(5);  // Keep LED on for 5 seconds
             digitalWrite(LED_PIN, LOW);  // Turn off LED
+            sleep(5);  // Wait for 5 seconds after LED is turned off to not detect motion
         } else {
-            usleep(100000);  // Check sensor status every 0.1 seconds
+            usleep(100000);  // Sensor status check interval (0.1 second)
         }
     }
 
